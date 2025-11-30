@@ -1,12 +1,10 @@
 import MovieCard from "@/components/MovieCard";
-import { Movie, MoviesResponse } from "@/types/movie";
+import { fetchPopularMovies } from "@/lib/api";
+import { Movie } from "@/types/movie";
 
 export default async function Home() {
-  const res = await fetch(
-    `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.TMDB_API_KEY}`
-  );
-  const data: MoviesResponse = await res.json();
-
+  const data = await fetchPopularMovies();
+  
   return (
     <div>
       <h1>Popular Movies</h1>
