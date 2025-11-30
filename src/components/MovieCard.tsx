@@ -1,17 +1,20 @@
+import { Movie } from "@/types/movie";
+
 interface MovieCardProps {
-  title: string;
-  posterPath: string | null;
+  movie: Movie;
 }
 
-export default function MovieCard({ title, posterPath }: MovieCardProps) {
-  const imgUrl = posterPath
-    ? `https://image.tmdb.org/t/p/w500${posterPath}`
+export default function MovieCard({ movie }: MovieCardProps) {
+  const imgUrl = movie.poster_path
+    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : "https://placehold.co/500x750?text=No+Image";
 
   return (
-    <div className="border rounded p-2 shadow">
-      <img src={imgUrl} alt={title} className="w-full rounded mb-2" />
-      <h2 className="font-semibold">{title}</h2>
+    <div className="border border-gray-700 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow duration-200"
+      style={{ backgroundColor: "#1A1A1A", borderColor:"#262626" }}>
+      <img src={imgUrl} alt={movie.title} className="w-full rounded mb-2" />
+      <h2 className="font-semibold text-lg">{movie.title}</h2>
+      <p className="text-gray-400 text-sm">{movie.release_date}</p>
     </div>
   );
 }
