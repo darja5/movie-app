@@ -21,8 +21,9 @@ export default function HomeClient({ initialMovies }: Props) {
                 <SearchBar onSearch={setQuery} />
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    {filteredMovies?.map((movie: Movie) => (
+                    {filteredMovies?.map((movie: Movie, index) => (
                         <MovieCard
+                            key={index}
                             movie={movie}
                         />
                     ))}
