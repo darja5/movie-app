@@ -8,14 +8,15 @@ import { useState } from "react";
 
 interface Props {
     initialMovies: Movie[];
+    initialTotalPages: number;
 }
 
-export default function HomeClient({ initialMovies }: Props) {
+export default function HomeClient({ initialMovies, initialTotalPages }: Props) {
     const [movies, setMovies] = useState<Movie[]>(initialMovies);
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(initialTotalPages);
 
     const fetchMovies = async (query: string, pageNumber: number) => {
         if (!query) return;
@@ -40,20 +41,35 @@ export default function HomeClient({ initialMovies }: Props) {
 
     const handleSearch = async () => {
         setPage(1);
+
+        // Empty search -> show popular movies
         if (!searchQuery.trim()) {
-            // prazno iskanje -> pokaži popular movies
             const data = await fetchPopularMovies();
             setMovies(data.results);
             setTotalPages(data.total_pages);
-        } else {
-            fetchMovies(searchQuery, 1);
+            return;
         }
+
+        fetchMovies(searchQuery, 1);
     };
 
-    const loadMore = () => {
+    const loadMore = async () => {
         const nextPage = page + 1;
         setPage(nextPage);
-        fetchMovies(searchQuery, nextPage);
+
+        // SEARCH MODE
+        if (searchQuery.trim()) {
+            fetchMovies(searchQuery, nextPage);
+            return;
+        }
+
+        // POPULAR MODE
+        setLoading(true);
+        const data = await fetchPopularMovies(nextPage);
+        setMovies(prev => [...prev, ...data.results]);
+        setTotalPages(data.total_pages);
+        console.log(data.total_pages);
+        setLoading(false);
     };
 
     return (

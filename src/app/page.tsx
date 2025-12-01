@@ -6,6 +6,6 @@ export default async function Home() {
   const movies = data?.results || [];
 
   return (
-    <HomeClient initialMovies={movies}/>
+    <HomeClient initialMovies={movies} initialTotalPages={data.total_pages}/>
   );
 }
