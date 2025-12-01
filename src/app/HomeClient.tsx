@@ -12,6 +12,9 @@ interface Props {
 }
 
 export default function HomeClient({ initialMovies, initialTotalPages }: Props) {
+    const [initialPopularMovies] = useState<Movie[]>(initialMovies);
+    const [initialTotalPopularPages] = useState(initialTotalPages);
+
     const [movies, setMovies] = useState<Movie[]>(initialMovies);
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
@@ -44,9 +47,9 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
 
         // Empty search -> show popular movies
         if (!searchQuery.trim()) {
-            const data = await fetchPopularMovies();
-            setMovies(data.results);
-            setTotalPages(data.total_pages);
+            setMovies(initialPopularMovies);
+            setPage(1);
+            setTotalPages(initialTotalPopularPages);
             return;
         }
 
@@ -77,6 +80,12 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
             <h1 className="text-3xl font-bold mb-6 text-center">Popular Movies</h1>
 
             <SearchBar onSearch={setSearchQuery} searchQuery={searchQuery} handleSearch={handleSearch} />
+
+            <h2 className="text-xl mb-4">
+                {searchQuery.trim()
+                    ? `Results for "${searchQuery}"`
+                    : "Popular Movies"}
+            </h2>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {movies?.map((movie: Movie) => (
