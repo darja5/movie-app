@@ -2,7 +2,6 @@
 
 import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
-import { fetchPopularMovies } from "@/lib/api";
 import { Movie } from "@/types/movie";
 import { useState } from "react";
 
@@ -10,6 +9,8 @@ interface Props {
     initialMovies: Movie[];
     initialTotalPages: number;
 }
+
+const CLIENT_API_KEY = process.env.NEXT_PUBLIC_TMDB_KEY;
 
 export default function HomeClient({ initialMovies, initialTotalPages }: Props) {
     const [initialPopularMovies] = useState<Movie[]>(initialMovies);
@@ -26,7 +27,7 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
 
         setLoading(true);
         const res = await fetch(
-            `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}&query=${encodeURIComponent(query)}&page=${pageNumber}`,
+            `https://api.themoviedb.org/3/search/movie?api_key=${CLIENT_API_KEY}&query=${encodeURIComponent(query)}&page=${pageNumber}`,
             { cache: "no-store" }
         );
 
@@ -68,7 +69,11 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
 
         // POPULAR MODE
         setLoading(true);
-        const data = await fetchPopularMovies(nextPage);
+        const res = await fetch(
+            `https://api.themoviedb.org/3/movie/popular?api_key=${CLIENT_API_KEY}&language=en-US&page=${nextPage}`,
+            { cache: "no-store" }
+        );
+        const data = await res.json();
         setMovies(prev => [...prev, ...data.results]);
         setTotalPages(data.total_pages);
         console.log(data.total_pages);
