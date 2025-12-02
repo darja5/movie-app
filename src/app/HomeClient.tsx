@@ -3,7 +3,8 @@
 import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
 import { Movie } from "@/types/movie";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
     initialMovies: Movie[];
@@ -13,11 +14,12 @@ interface Props {
 const CLIENT_API_KEY = process.env.NEXT_PUBLIC_TMDB_KEY;
 
 export default function HomeClient({ initialMovies, initialTotalPages }: Props) {
-    const [initialPopularMovies] = useState<Movie[]>(initialMovies);
-    const [initialTotalPopularPages] = useState(initialTotalPages);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const queryFromUrl = searchParams.get("search") || "";
 
-    const [movies, setMovies] = useState<Movie[]>(initialMovies);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [movies, setMovies] = useState<Movie[] | null>(null);
+    const [searchQuery, setSearchQuery] = useState(queryFromUrl);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [totalPages, setTotalPages] = useState(initialTotalPages);
@@ -32,29 +34,41 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
         );
 
         if (!res.ok) {
-            console.error("Fetch error:", res.status);
             setLoading(false);
             return;
         }
 
         const data = await res.json();
-        setMovies(prev => pageNumber === 1 ? data.results : [...prev, ...data.results]);
+        setMovies(prev => pageNumber === 1 ? data.results : [...(prev || []), ...data.results]);
         setTotalPages(data.total_pages);
         setLoading(false);
     };
 
-    const handleSearch = async () => {
+    useEffect(() => {
+        const loadMoviesFromQuery = async () => {
+            if (queryFromUrl.trim()) {
+                setSearchQuery(queryFromUrl);
+                setPage(1);
+                await fetchMovies(queryFromUrl, 1);
+            } else {
+                setMovies(initialMovies);
+                setTotalPages(initialTotalPages);
+            }
+        };
+
+        loadMoviesFromQuery();
+    }, [queryFromUrl, initialMovies, initialTotalPages]);
+
+    const handleSearch = () => {
         setPage(1);
 
-        // Empty search -> show popular movies
-        if (!searchQuery.trim()) {
-            setMovies(initialPopularMovies);
-            setPage(1);
-            setTotalPages(initialTotalPopularPages);
-            return;
+        if (searchQuery.trim()) {
+            router.push(`/?search=${encodeURIComponent(searchQuery)}`);
+        } else {
+            router.push(`/`);
+            setMovies(initialMovies);
+            setTotalPages(initialTotalPages);
         }
-
-        fetchMovies(searchQuery, 1);
     };
 
     const loadMore = async () => {
@@ -74,9 +88,8 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
             { cache: "no-store" }
         );
         const data = await res.json();
-        setMovies(prev => [...prev, ...data.results]);
+        setMovies(prev => [...(prev || []), ...data.results]);
         setTotalPages(data.total_pages);
-        console.log(data.total_pages);
         setLoading(false);
     };
 
@@ -93,14 +106,17 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
             </h2>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {movies?.map((movie: Movie) => (
+                {movies === null ? (
+                    <div>Loading...</div>
+                ) : movies?.map((movie: Movie) => (
                     <MovieCard
                         key={movie.id}
                         movie={movie}
                     />
                 ))}
             </div>
-            {movies.length > 0 && page < totalPages && (
+
+            {movies !== null && movies.length > 0 && page < totalPages && (
                 <div className="mt-4 text-center">
                     <button
                         onClick={loadMore}

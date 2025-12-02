@@ -12,7 +12,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
     console.error(`Movie missing ID: ${movie.title}`);
   }
 
-  console.log(`Link created for: ${movie.title} with ID: /movie/${movie.id}`);
   return (
     <Link href={`/movie/${movie.id}`}>
       <div className="border border-gray-700 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow duration-200"
