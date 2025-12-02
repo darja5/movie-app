@@ -21,23 +21,29 @@ export default async function MoviePage({ params }: MoviePageProps) {
 
     const movie = await fetchMovieDetails(movieId);
 
-    const imgUrl = movie.poster_path
-        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-        : "https://placehold.co/200x300?text=No+Image";
-
     return (
         <div className="p-6 min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start gap-8">
 
                 {/* Poster */}
                 <div className="w-full md:w-1/3 flex justify-center md:justify-start">
-                    <Image
-                        src={imgUrl}
-                        alt={movie.title}
-                        width={400}
-                        height={600}
-                        className="rounded object-cover w-full max-w-sm"
-                    />
+                    {movie.poster_path ? (
+                        <Image
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                            alt={movie.title}
+                            width={400}
+                            height={600}
+                            className="rounded object-cover w-full max-w-sm"
+                        />
+                    ) : (
+                        <img
+                            src="https://placehold.co/200x300?text=No+Image"
+                            alt="No Image"
+                            className="rounded object-cover w-full max-w-sm"
+                        />
+                    )}
+
+
                 </div>
 
                 {/* Movie Info */}
