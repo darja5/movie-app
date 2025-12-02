@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'; 
+export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import { fetchMovieDetails } from "@/lib/api";
 import { notFound } from "next/navigation";
@@ -13,32 +13,40 @@ interface MoviePageProps {
 
 export default async function MoviePage({ params }: MoviePageProps) {
     const resolvedParams = await params;
-    const movieId = resolvedParams.id as string; 
-    
+    const movieId = resolvedParams.id as string;
+
     if (!movieId || !/^\d+$/.test(movieId)) {
         notFound();
     }
-    
+
     const movie = await fetchMovieDetails(movieId);
+
     const imgUrl = movie.poster_path
-    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : "https://placehold.co/200x300?text=No+Image";
+        ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        : "https://placehold.co/200x300?text=No+Image";
 
     return (
-        <div className="p-6 text-white" style={{ backgroundColor: "#141414" }}>
-            <div className="max-w-4xl mx-auto">
-                <Image
-                    src={imgUrl}
-                    width={200} 
-                    height={300}
-                    alt={movie.title}
-                    className="rounded mb-4"
-                />
+        <div className="p-6 min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start gap-8">
 
-                <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>
-                <p className="text-gray-400 mb-2">**Release Date:** {movie.release_date}</p>
-                <p className="text-gray-400 mb-4">**Rating:** {movie.vote_average.toFixed(1)} / 10</p> 
-                <p className="text-lg leading-relaxed">{movie.overview}</p>
+                {/* Poster */}
+                <div className="w-full md:w-1/3 flex justify-center md:justify-start">
+                    <Image
+                        src={imgUrl}
+                        alt={movie.title}
+                        width={400}
+                        height={600}
+                        className="rounded object-cover w-full max-w-sm"
+                    />
+                </div>
+
+                {/* Movie Info */}
+                <div className="flex flex-col flex-1 md:pt-2">
+                    <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>
+                    <p className="text-gray-400 mb-2">Release Date: {movie.release_date}</p>
+                    <p className="text-gray-400 mb-4">Rating: {movie.vote_average.toFixed(1)} / 10</p>
+                    <p className="text-lg leading-relaxed">{movie.overview}</p>
+                </div>
             </div>
         </div>
     );
