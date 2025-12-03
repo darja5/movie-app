@@ -36,12 +36,14 @@ export default async function MoviePage({ params }: MoviePageProps) {
                             alt={movie.title}
                             width={400}
                             height={600}
+                            loading="lazy"
                             className="rounded object-cover w-full max-w-sm"
                         />
                     ) : (
                         <img
                             src="https://placehold.co/200x300?text=No+Image"
                             alt="No Image"
+                            loading="lazy"
                             className="rounded object-cover w-full max-w-sm"
                         />
                     )}

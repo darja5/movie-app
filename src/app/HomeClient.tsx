@@ -41,7 +41,13 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
         }
 
         const data = await res.json();
-        setMovies(prev => pageNumber === 1 ? data.results : [...(prev || []), ...data.results]);
+        setMovies(prev => {
+            const newMovies = pageNumber === 1 ? data.results : [...(prev || []), ...data.results]
+            const uniqueMovies = Array.from(
+                new Map(newMovies.map((m: Movie) => [m.id, m])).values()
+            ) as Movie[];
+            return uniqueMovies;
+        });
         setTotalPages(data.total_pages);
         setLoading(false);
     };
@@ -75,7 +81,13 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
             { cache: "no-store" }
         );
         const data = await res.json();
-        setMovies(prev => [...(prev || []), ...data.results]);
+        setMovies(prev => {
+            const newMovies = [...(prev || []), ...data.results]
+            const uniqueMovies = Array.from(
+                new Map(newMovies.map((m: Movie) => [m.id, m])).values()
+            ) as Movie[];
+            return uniqueMovies;
+        });
         setTotalPages(data.total_pages);
         setLoading(false);
     }, [page, searchQuery]);
