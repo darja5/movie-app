@@ -5,6 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import { Movie } from "@/types/movie";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Header from "@/components/Header";
 
 interface Props {
     initialMovies: Movie[];
@@ -63,7 +64,7 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
 
         // SEARCH MODE
         if (searchQuery.trim()) {
-            fetchMovies(searchQuery, nextPage);
+            await fetchMovies(searchQuery, nextPage);
             return;
         }
 
@@ -78,6 +79,23 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
         setTotalPages(data.total_pages);
         setLoading(false);
     }, [page, searchQuery]);
+
+    useEffect(() => {
+        const resetToHome = async () => {
+            if (queryFromUrl) {
+                await fetchMovies(queryFromUrl, 1);
+                setSearchQuery(queryFromUrl);
+                return;
+            }
+
+            setSearchQuery("");
+            setMovies(initialMovies);
+            setPage(1);
+            setTotalPages(initialTotalPages);
+        }
+
+        resetToHome();
+    }, [queryFromUrl]);
 
     useEffect(() => {
         if (!loadMoreRef.current) return;
@@ -99,12 +117,13 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
     useEffect(() => {
         const loadMoviesFromQuery = async () => {
             if (queryFromUrl.trim()) {
-                setSearchQuery(queryFromUrl);
-                setPage(1);
                 await fetchMovies(queryFromUrl, 1);
+                setPage(1);
             } else {
                 setMovies(initialMovies);
                 setTotalPages(initialTotalPages);
+                setPage(1);
+                setSearchQuery("");
             }
         };
 
@@ -112,29 +131,33 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
     }, [queryFromUrl, initialMovies, initialTotalPages]);
 
     return (
-        <div className="min-h-screen text-white p-4 md:p-8" style={{ backgroundColor: "#141414" }}>
-            <h1 className="text-3xl font-bold mb-6 text-center">Popular Movies</h1>
+        <div className="min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
+            <Header />
 
-            <SearchBar onSearch={setSearchQuery} searchQuery={searchQuery} handleSearch={handleSearch} />
+            <div className="p-4 md:p-8">
+                <SearchBar onSearch={setSearchQuery} searchQuery={searchQuery} handleSearch={handleSearch} />
 
-            <h2 className="text-xl mb-4">
-                {searchQuery.trim()
-                    ? `Results for "${searchQuery}"`
-                    : "Popular Movies"}
-            </h2>
+                <h2 className="text-xl mb-4">
+                    {!searchQuery.trim()
+                        ? "Popular Movies"
+                        : movies?.length === 0
+                            ? `No results found for "${searchQuery}"`
+                            : `Results for "${searchQuery}"`
+                    }
+                </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {movies === null ? (
-                    <div>Loading...</div>
-                ) : movies?.map((movie: Movie) => (
-                    <MovieCard
-                        key={movie.id}
-                        movie={movie}
-                    />
-                ))}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {movies === null ? (
+                        <div>Loading...</div>
+                    ) : movies?.map((movie: Movie) => (
+                        <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                        />
+                    ))}
+                </div>
+                <div ref={loadMoreRef} />
             </div>
-
-            <div ref={loadMoreRef} />
         </div>
     )
 }

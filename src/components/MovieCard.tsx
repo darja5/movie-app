@@ -14,7 +14,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
   return (
     <Link href={`/movie/${movie.id}`}>
-      <div className="border border-gray-700 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow duration-200"
+      <div className="border border-gray-700 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow duration-200
+      cursor-pointer transition duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg"
         style={{ backgroundColor: "#1A1A1A", borderColor: "#262626" }}>
         {movie.poster_path ? (
           <Image
@@ -31,10 +32,9 @@ export default function MovieCard({ movie }: MovieCardProps) {
             className="rounded mb-4 w-full h-auto"
           />
         )}
-        <h2 className="font-semibold text-lg">{movie.title}</h2>
-        <p className="text-gray-400 text-sm">{movie.release_date}</p>
+        {movie.title && <h2 className="font-semibold text-lg">{movie.title}</h2>}
+        {movie.release_date && <p className="text-gray-400 text-sm">{new Date(movie.release_date).toLocaleDateString("sl-SI")}</p>}
       </div>
     </Link>
-
   );
 }

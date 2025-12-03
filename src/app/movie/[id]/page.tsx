@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import { fetchMovieDetails } from "@/lib/api";
 import { notFound } from "next/navigation";
+import Rating from "@mui/material/Rating";
+import Header from '@/components/Header';
 
 interface ParamsObject {
     id: string;
@@ -22,8 +24,9 @@ export default async function MoviePage({ params }: MoviePageProps) {
     const movie = await fetchMovieDetails(movieId);
 
     return (
-        <div className="p-6 min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
-            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start gap-8">
+        <div className="min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
+            <Header/>
+            <div className="p-6 max-w-6xl mx-auto flex flex-col md:flex-row items-start gap-8">
 
                 {/* Poster */}
                 <div className="w-full md:w-1/3 flex justify-center md:justify-start">
@@ -47,11 +50,26 @@ export default async function MoviePage({ params }: MoviePageProps) {
                 </div>
 
                 {/* Movie Info */}
-                <div className="flex flex-col flex-1 md:pt-2">
-                    <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>
-                    <p className="text-gray-400 mb-2">Release Date: {movie.release_date}</p>
-                    <p className="text-gray-400 mb-4">Rating: {movie.vote_average.toFixed(1)} / 10</p>
-                    <p className="text-lg leading-relaxed">{movie.overview}</p>
+                <div className="flex flex-col flex-1 items-center md:items-start md:pt-2">
+                    {movie.title && <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>}
+                    {movie.release_date && <p className="text-gray-400 mb-2">Release Date: {new Date(movie.release_date).toLocaleDateString("sl-SI")}</p>}
+                    {movie.vote_average &&
+                        <p className="mb-2">
+                            <Rating
+                                name="movie-rating"
+                                value={movie.vote_average / 2}
+                                precision={0.5}
+                                readOnly
+                                sx={{
+                                    color: "#E50000",
+                                    "& .MuiRating-iconEmpty": {
+                                        color: "#555",
+                                    },
+                                }}
+                            />
+                        </p>}
+
+                    {movie.overview && <p className="text-lg leading-relaxed text-center md:text-left">{movie.overview}</p>}
                 </div>
             </div>
         </div>
