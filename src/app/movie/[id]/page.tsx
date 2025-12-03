@@ -31,7 +31,6 @@ export default async function MoviePage({ params }: MoviePageProps) {
                         <Image
                             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                             alt={movie.title}
-                            priority
                             width={400}
                             height={600}
                             className="rounded object-cover w-full max-w-sm"

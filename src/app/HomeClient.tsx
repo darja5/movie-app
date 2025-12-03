@@ -3,7 +3,7 @@
 import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
 import { Movie } from "@/types/movie";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
@@ -23,6 +23,7 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [totalPages, setTotalPages] = useState(initialTotalPages);
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     const fetchMovies = async (query: string, pageNumber: number) => {
         if (!query) return;
@@ -44,21 +45,6 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
         setLoading(false);
     };
 
-    useEffect(() => {
-        const loadMoviesFromQuery = async () => {
-            if (queryFromUrl.trim()) {
-                setSearchQuery(queryFromUrl);
-                setPage(1);
-                await fetchMovies(queryFromUrl, 1);
-            } else {
-                setMovies(initialMovies);
-                setTotalPages(initialTotalPages);
-            }
-        };
-
-        loadMoviesFromQuery();
-    }, [queryFromUrl, initialMovies, initialTotalPages]);
-
     const handleSearch = () => {
         setPage(1);
 
@@ -71,7 +57,7 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
         }
     };
 
-    const loadMore = async () => {
+    const loadMore = useCallback(async () => {
         const nextPage = page + 1;
         setPage(nextPage);
 
@@ -91,7 +77,39 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
         setMovies(prev => [...(prev || []), ...data.results]);
         setTotalPages(data.total_pages);
         setLoading(false);
-    };
+    }, [page, searchQuery]);
+
+    useEffect(() => {
+        if (!loadMoreRef.current) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const first = entries[0];
+                if (first.isIntersecting && !loading && page < totalPages) {
+                    loadMore();
+                }
+            },
+            { rootMargin: "300px", }
+        );
+
+        observer.observe(loadMoreRef.current);
+        return () => observer.disconnect();
+    }, [loading, page, totalPages, loadMore]);
+
+    useEffect(() => {
+        const loadMoviesFromQuery = async () => {
+            if (queryFromUrl.trim()) {
+                setSearchQuery(queryFromUrl);
+                setPage(1);
+                await fetchMovies(queryFromUrl, 1);
+            } else {
+                setMovies(initialMovies);
+                setTotalPages(initialTotalPages);
+            }
+        };
+
+        loadMoviesFromQuery();
+    }, [queryFromUrl, initialMovies, initialTotalPages]);
 
     return (
         <div className="min-h-screen text-white p-4 md:p-8" style={{ backgroundColor: "#141414" }}>
@@ -116,17 +134,7 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
                 ))}
             </div>
 
-            {movies !== null && movies.length > 0 && page < totalPages && (
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={loadMore}
-                        className="bg-[#333333] text-white px-4 py-2 rounded hover:bg-[#E50000] transition"
-                        disabled={loading}
-                    >
-                        {loading ? "Loading..." : "Load More"}
-                    </button>
-                </div>
-            )}
+            <div ref={loadMoreRef} />
         </div>
     )
 }
