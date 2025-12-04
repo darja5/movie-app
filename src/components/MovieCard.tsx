@@ -24,6 +24,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
             alt={movie.title}
             loading="lazy"
             className="rounded mb-4"
+            unoptimized
           />
         ) : (
           <img

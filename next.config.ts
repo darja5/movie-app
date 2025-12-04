@@ -1,19 +1,8 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  reactCompiler: true,
+const nextConfig = {
+  output: "standalone",
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "image.tmdb.org",
-      },
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-      },
-    ],
+    domains: ["image.tmdb.org", "placehold.co"],
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

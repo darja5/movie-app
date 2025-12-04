@@ -38,6 +38,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
                             height={600}
                             loading="lazy"
                             className="rounded object-cover w-full max-w-sm"
+                            unoptimized
                         />
                     ) : (
                         <img
