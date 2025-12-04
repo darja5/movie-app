@@ -143,7 +143,7 @@ export default function HomeClient({ initialMovies, initialTotalPages }: Props) 
     }, [queryFromUrl, initialMovies, initialTotalPages]);
 
     return (
-        <div className="min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
+        <div className="min-h-screen text-white bg-[#141414]">
             <Header />
 
             <div className="p-4 md:p-8">

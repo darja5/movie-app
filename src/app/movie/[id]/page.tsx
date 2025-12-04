@@ -24,7 +24,7 @@ export default async function MoviePage({ params }: MoviePageProps) {
     const movie = await fetchMovieDetails(movieId);
 
     return (
-        <div className="min-h-screen text-white" style={{ backgroundColor: "#141414" }}>
+        <div className="min-h-screen text-white bg-[#141414]">
             <Header/>
             <div className="p-6 max-w-6xl mx-auto flex flex-col md:flex-row items-start gap-8">
 

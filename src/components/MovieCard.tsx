@@ -14,9 +14,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
   return (
     <Link href={`/movie/${movie.id}`}>
-      <div className="border border-gray-700 rounded-lg p-3 duration-200
-      cursor-pointer transition transform hover:scale-105 active:scale-95 flex flex-col h-full"
-        style={{ backgroundColor: "#1A1A1A", borderColor: "#262626" }}>
+      <div className="border rounded-lg p-3 duration-200
+      cursor-pointer transition transform hover:scale-105 active:scale-95 flex flex-col h-full bg-[#1A1A1A] border-[#333]">
         {movie.poster_path ? (
           <Image
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
