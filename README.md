@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Movie App
 
-## Getting Started
+**Author:** Darja Peternel
 
-First, run the development server:
+---
+
+## Description
+
+This is a movie browsing app built with Next.js and TypeScript. Users can search for movies, view popular movies, and see detailed information about each movie. The app features infinite scroll, lazy-loaded images, and a responsive UI.
+
+---
+
+## Features Implemented
+
+- Infinite scroll for movie lists
+- Search functionality
+- Movie details page with dynamic routing
+- Rating stars displayed for movies
+- Fallbacks for missing data (e.g., no overview or missing images)
+- Header with logo linking to home page and clearing search query
+- Lazy loading for images
+- Dockerized for standalone deployment
+
+---
+
+## Requirements Not Implemented
+
+- None; all requested features have been implemented.
+
+---
+
+## Issues Faced During Implementation
+
+- Handling duplicate movie IDs when loading more movies with infinite scroll. Solved using a `Map` to ensure uniqueness.
+- Next.js Image Optimization did not work properly in Docker standalone build. Solved by using `unoptimized` on the `<Image>` component and configuring `domains` in `next.config.js`.
+- `useSearchParams()` needed proper handling to ensure search query is cleared when navigating back to home.
+- Minor UI/UX adjustments were required to make cards consistent in size and improve hover/click effects.
+- Docker build initially used a Node.js version mismatch in the image; resolved by using Node 20.
+
+---
+
+## Improvements with More Time
+
+- Add pagination for better performance on very large movie lists.
+- Add unit/integration tests to cover components and API calls.
+
+---
+
+## Running the App
+
+### Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Using Docker
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Make sure your environment variables are set in the Dockerfile or `.env.local`:
+  - `NEXT_PUBLIC_TMDB_KEY`
+  - `TMDB_API_KEY`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Build the Docker image:
 
-## Learn More
+```bash
+docker build -t movie-app .
+```
 
-To learn more about Next.js, take a look at the following resources:
+- Run the Docker container:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+docker run -p 3000:3000 movie-app
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Access the app at http://localhost:3000.
